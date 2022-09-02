@@ -82,11 +82,21 @@ type ContourSettings struct {
 	// +optional
 	NodePlacement *NodePlacement `json:"nodePlacement,omitempty"`
 
+<<<<<<< HEAD
 	// LogLevel sets the log level for Contour
 	// Allowed values are "info", "debug".
 	//
 	// +optional
 	LogLevel LogLevel `json:"logLevel,omitempty"`
+=======
+	// KubernetesLogLevel Enable Kubernetes client debug logging with log level. If unset,
+	// defaults to 0.
+	//
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=9
+	// +optional
+	KubernetesLogLevel uint8 `json:"kubernetesLogLevel,omitempty"`
+>>>>>>> feat/k8s-debug
 }
 
 // EnvoySettings contains settings for the Envoy part of the installation,
