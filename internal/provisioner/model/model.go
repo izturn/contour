@@ -179,6 +179,12 @@ type ContourSpec struct {
 	// defaults to 0.
 	KubernetesLogLevel uint8
 
+	// Compute Resources required by envoy container.
+	EnvoyResources corev1.ResourceRequirements
+
+	// Compute Resources required by contour container.
+	ContourResources corev1.ResourceRequirements
+
 	// ComponentLabels is a set of labels to add to the provisioned Contour component.
 	ComponentLabels map[string]string
 
