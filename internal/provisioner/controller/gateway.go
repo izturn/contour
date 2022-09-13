@@ -293,6 +293,10 @@ func (r *gatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				}
 			}
 
+			for k, v := range gatewayClassParams.Spec.Envoy.PodAnnotations {
+				contourModel.Spec.EnvoyPodAnnotations[k] = v
+			}
+
 			// volume mount
 			contourModel.Spec.EnvoyExtraVolumeMounts = append(contourModel.Spec.EnvoyExtraVolumeMounts, gatewayClassParams.Spec.Envoy.ExtraVolumeMounts...)
 			contourModel.Spec.EnvoyExtraVolumes = append(contourModel.Spec.EnvoyExtraVolumes, gatewayClassParams.Spec.Envoy.ExtraVolumes...)

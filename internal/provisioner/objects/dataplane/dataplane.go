@@ -341,14 +341,8 @@ func DesiredDaemonSet(contour *model.Contour, contourImage, envoyImage string) *
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					// TODO [danehans]: Remove the prometheus annotations when Contour is updated to
-					// show how the Prometheus Operator is used to scrape Contour/Envoy metrics.
-					Annotations: map[string]string{
-						"prometheus.io/scrape": "true",
-						"prometheus.io/port":   "8002",
-						"prometheus.io/path":   "/stats/prometheus",
-					},
-					Labels: EnvoyPodSelector(contour).MatchLabels,
+					Annotations: contour.Spec.EnvoyPodAnnotations,
+					Labels:      EnvoyPodSelector(contour).MatchLabels,
 				},
 				Spec: corev1.PodSpec{
 					Containers:     containers,
@@ -423,14 +417,8 @@ func desiredDeployment(contour *model.Contour, contourImage, envoyImage string) 
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					// TODO [danehans]: Remove the prometheus annotations when Contour is updated to
-					// show how the Prometheus Operator is used to scrape Contour/Envoy metrics.
-					Annotations: map[string]string{
-						"prometheus.io/scrape": "true",
-						"prometheus.io/port":   "8002",
-						"prometheus.io/path":   "/stats/prometheus",
-					},
-					Labels: EnvoyPodSelector(contour).MatchLabels,
+					Annotations: contour.Spec.EnvoyPodAnnotations,
+					Labels:      EnvoyPodSelector(contour).MatchLabels,
 				},
 				Spec: corev1.PodSpec{
 					// TODO anti-affinity

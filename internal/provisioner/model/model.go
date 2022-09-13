@@ -53,6 +53,13 @@ func Default(namespace, name string) *Contour {
 					},
 				},
 			},
+			// TODO [danehans]: Remove the prometheus annotations when Contour is updated to
+			// show how the Prometheus Operator is used to scrape Contour/Envoy metrics.
+			EnvoyPodAnnotations: map[string]string{
+				"prometheus.io/scrape": "true",
+				"prometheus.io/port":   "8002",
+				"prometheus.io/path":   "/stats/prometheus",
+			},
 		},
 	}
 }
@@ -166,6 +173,9 @@ type ContourSpec struct {
 	// KubernetesLogLevel Enable Kubernetes client debug logging with log level. If unset,
 	// defaults to 0.
 	KubernetesLogLevel uint8
+
+	// PodAnnotations holds the annotations that will be add to the envoy‘s pod.
+	EnvoyPodAnnotations map[string]string
 
 	// EnvoyExtraVolumes holds the extra volumes to add to envoy's pod.
 	EnvoyExtraVolumes []corev1.Volume
