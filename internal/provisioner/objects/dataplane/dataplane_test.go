@@ -136,6 +136,24 @@ func checkDaemonSetHasNodeSelector(t *testing.T, ds *appsv1.DaemonSet, expected 
 	t.Errorf("deployment has unexpected node selector %q", expected)
 }
 
+func checkDaemonSetHasUpdateStrategy(t *testing.T, ds *appsv1.DaemonSet, expected appsv1.DaemonSetUpdateStrategy) {
+	t.Helper()
+
+	if apiequality.Semantic.DeepEqual(ds.Spec.UpdateStrategy, expected) {
+		return
+	}
+	t.Errorf("daemonset has unexpected update strategy %q", expected)
+}
+
+func checkDeploymentHasStrategy(t *testing.T, ds *appsv1.Deployment, expected appsv1.DeploymentStrategy) {
+	t.Helper()
+
+	if apiequality.Semantic.DeepEqual(ds.Spec.Strategy, expected) {
+		return
+	}
+	t.Errorf("deployment has unexpected strategy %q", expected)
+}
+
 func checkDaemonSetHasVolume(t *testing.T, ds *appsv1.DaemonSet, vol corev1.Volume, volMount corev1.VolumeMount) {
 	t.Helper()
 
@@ -245,11 +263,22 @@ func TestDesiredDaemonSet(t *testing.T) {
 	checkDaemonSetHasNodeSelector(t, ds, nil)
 	checkDaemonSetHasTolerations(t, ds, nil)
 	checkDaemonSecurityContext(t, ds)
-
+	checkDaemonSetHasUpdateStrategy(t, ds, cntr.Spec.EnvoyUpdateStrategy)
 	checkDaemonSetHasResourceRequirements(t, ds, resQutoa)
 	checkDaemonSetHasPodAnnotations(t, ds, cntr.Spec.EnvoyPodAnnotations)
 
 	checkDaemonSetHasVolume(t, ds, volTest, volTestMount)
+}
+
+func TestDesiredDeployment(t *testing.T) {
+	name := "deploy-test"
+	cntr := model.Default(fmt.Sprintf("%s-ns", name), name)
+
+	testContourImage := "ghcr.io/projectcontour/contour:test"
+	testEnvoyImage := "docker.io/envoyproxy/envoy:test"
+	deploy := desiredDeployment(cntr, testContourImage, testEnvoyImage)
+	checkDeploymentHasStrategy(t, deploy, cntr.Spec.EnvoyStrategy)
+
 }
 
 func TestNodePlacementDaemonSet(t *testing.T) {

@@ -16,6 +16,7 @@ package v1alpha1
 import (
 	"fmt"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -100,6 +101,10 @@ type ContourSettings struct {
 	// +optional
 	LogLevel LogLevel `json:"logLevel,omitempty"`
 
+	// Strategy describes the deployment strategy to use to replace existing Contour pods with new ones.
+	// +optional
+	Strategy *appsv1.DeploymentStrategy `json:"strategy,omitempty"`
+
 	// Compute Resources required by contour container.
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -151,6 +156,16 @@ type EnvoySettings struct {
 	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	// +optional
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// An update strategy to replace existing Envoy DaemonSet pods with new pods.
+	// when envoy be running as a `Deployment`,it's must be nil
+	// +optional
+	UpdateStrategy *appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+
+	// Strategy describes the deployment strategy to use to replace existing Envoy pods with new ones.
+	// when envoy be running as a `DaemonSet`,it's must be nil
+	// +optional
+	Strategy *appsv1.DeploymentStrategy `json:"strategy,omitempty"`
 }
 
 // WorkloadType is the type of Kubernetes workload to use for a component.
