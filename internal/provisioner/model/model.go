@@ -60,6 +60,11 @@ func Default(namespace, name string) *Contour {
 				"prometheus.io/port":   "8002",
 				"prometheus.io/path":   "/stats/prometheus",
 			},
+			ComponentLabels: map[string]string{
+				"app.kubernetes.io/name":       "contour",
+				"app.kubernetes.io/component":  "ingress-controller",
+				"app.kubernetes.io/managed-by": "contour-gateway-provisioner",
+			},
 		},
 	}
 }
@@ -173,6 +178,9 @@ type ContourSpec struct {
 	// KubernetesLogLevel Enable Kubernetes client debug logging with log level. If unset,
 	// defaults to 0.
 	KubernetesLogLevel uint8
+
+	// ComponentLabels is a set of labels to add to the provisioned Contour component.
+	ComponentLabels map[string]string
 
 	// PodAnnotations holds the annotations that will be add to the envoy‘s pod.
 	EnvoyPodAnnotations map[string]string
@@ -358,6 +366,8 @@ type EnvoyNetworkPublishing struct {
 	// ServiceAnnotations is a set of annotations to add to the provisioned Envoy service.
 	ServiceAnnotations map[string]string
 }
+
+//
 
 type NetworkPublishingType = contourv1alpha1.NetworkPublishingType
 
