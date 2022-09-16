@@ -136,6 +136,7 @@ container: ## Build the Contour container image
 		--build-arg "BUILD_SHA=$(BUILD_SHA)" \
 		--build-arg "BUILD_CGO_ENABLED=$(BUILD_CGO_ENABLED)" \
 		--build-arg "BUILD_EXTRA_GO_LDFLAGS=$(BUILD_EXTRA_GO_LDFLAGS)" \
+		--network host \
 		$(DOCKER_BUILD_LABELS) \
 		$(shell pwd) \
 		--tag $(IMAGE):$(VERSION)
