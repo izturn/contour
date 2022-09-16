@@ -336,8 +336,10 @@ func DesiredDaemonSet(contour *model.Contour, contourImage, envoyImage string) *
 			UpdateStrategy: contour.Spec.EnvoyUpdateStrategy,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
+					// TODO [danehans]: Remove the prometheus annotations when Contour is updated to
+					// show how the Prometheus Operator is used to scrape Contour/Envoy metrics.
 					Annotations: contour.Spec.EnvoyPodAnnotations,
-					Labels:      EnvoyPodSelector(contour).MatchLabels,
+					Labels:      envoyPodLabels(contour),
 				},
 				Spec: corev1.PodSpec{
 					Containers:     containers,
@@ -408,7 +410,7 @@ func desiredDeployment(contour *model.Contour, contourImage, envoyImage string) 
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: contour.Spec.EnvoyPodAnnotations,
-					Labels:      EnvoyPodSelector(contour).MatchLabels,
+					Labels:      envoyPodLabels(contour),
 				},
 				Spec: corev1.PodSpec{
 					// TODO anti-affinity
@@ -543,4 +545,13 @@ func EnvoyPodSelector(contour *model.Contour) *metav1.LabelSelector {
 			"app": contour.EnvoyDataPlaneName(),
 		},
 	}
+}
+
+// envoyPodLabels returns the labels for envoy's pods
+func envoyPodLabels(contour *model.Contour) map[string]string {
+	labels := EnvoyPodSelector(contour).MatchLabels
+	for k, v := range model.CommonLabels(contour) {
+		labels[k] = v
+	}
+	return labels
 }

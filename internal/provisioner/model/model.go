@@ -64,11 +64,7 @@ func Default(namespace, name string) *Contour {
 				"prometheus.io/port":   "8002",
 				"prometheus.io/path":   "/stats/prometheus",
 			},
-			ComponentLabels: map[string]string{
-				"app.kubernetes.io/name":       "contour",
-				"app.kubernetes.io/component":  "ingress-controller",
-				"app.kubernetes.io/managed-by": "contour-gateway-provisioner",
-			},
+			CommonLabels: map[string]string{},
 			EnvoyUpdateStrategy: appsv1.DaemonSetUpdateStrategy{
 				Type: appsv1.RollingUpdateDaemonSetStrategyType,
 				RollingUpdate: &appsv1.RollingUpdateDaemonSet{
@@ -208,8 +204,8 @@ type ContourSpec struct {
 	// Compute Resources required by contour container.
 	ContourResources corev1.ResourceRequirements
 
-	// ComponentLabels is a set of labels to add to the provisioned Contour component.
-	ComponentLabels map[string]string
+	// CommonLabels is a set of labels to add to the provisioned Contour resource(s).
+	CommonLabels map[string]string
 
 	// PodAnnotations holds the annotations that will be add to the envoy‘s pod.
 	EnvoyPodAnnotations map[string]string
