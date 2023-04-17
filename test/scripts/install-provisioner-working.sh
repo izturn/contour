@@ -28,7 +28,8 @@ if ! kind::cluster::exists "$CLUSTERNAME" ; then
     exit 2
 fi
 
-# Set the image tag to match the current Contour version.
+# Set (pseudo) random image tag to trigger restarts at every deployment.
+# TODO: Come up with a scheme that doesn't fill up the dev environment with randomly-tagged images.
 VERSION="v$$"
 
 # Build the Contour Provisioner image.

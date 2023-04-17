@@ -179,6 +179,11 @@ func (p *HTTPProxyProcessor) computeHTTPProxy(proxy *contour_api_v1.HTTPProxy) {
 			"Spec.VirtualHost.IPAllowFilterPolicy and Spec.VirtualHost.IPDepnyFilterPolicy cannot both be defined.")
 		return
 	}
+	if proxy.Spec.VirtualHost.TLS == nil && proxy.Spec.VirtualHost.Authorization != nil && len(proxy.Spec.VirtualHost.Authorization.ExtensionServiceRef.Name) > 0 {
+		validCond.AddError(contour_api_v1.ConditionTypeAuthError, "AuthNotPermitted",
+			"Spec.VirtualHost.Authorization.ExtensionServiceRef can only be defined for root HTTPProxies that terminate TLS")
+		return
+	}
 
 	var tlsEnabled bool
 	if tls := proxy.Spec.VirtualHost.TLS; tls != nil {
@@ -568,6 +573,18 @@ func addRoutes(vhost vhost, routes []*Route) {
 	}
 }
 
+func addStatusBadGatewayRoute(routes []*Route, conds []contour_api_v1.MatchCondition) []*Route {
+	if len(conds) > 0 {
+		routes = append(routes, &Route{
+			PathMatchCondition:        mergePathMatchConditions(conds),
+			HeaderMatchConditions:     mergeHeaderMatchConditions(conds),
+			QueryParamMatchConditions: mergeQueryParamMatchConditions(conds),
+			DirectResponse:            directResponse(http.StatusBadGateway, ""),
+		})
+	}
+	return routes
+}
+
 func (p *HTTPProxyProcessor) computeRoutes(
 	validCond *contour_api_v1.DetailedCondition,
 	rootProxy *contour_api_v1.HTTPProxy,
@@ -633,21 +650,15 @@ func (p *HTTPProxyProcessor) computeRoutes(
 				"include %s/%s not found", namespace, include.Name)
 
 			// Set 502 response when include was not found but include condition was valid.
-			if len(include.Conditions) > 0 {
-				routes = append(routes, &Route{
-					PathMatchCondition:        mergePathMatchConditions(include.Conditions),
-					HeaderMatchConditions:     mergeHeaderMatchConditions(include.Conditions),
-					QueryParamMatchConditions: mergeQueryParamMatchConditions(include.Conditions),
-					DirectResponse:            directResponse(http.StatusBadGateway, ""),
-				})
-			}
-
+			routes = addStatusBadGatewayRoute(routes, include.Conditions)
 			continue
 		}
 
 		if includedProxy.Spec.VirtualHost != nil {
 			validCond.AddErrorf(contour_api_v1.ConditionTypeIncludeError, "RootIncludesRoot",
 				"root httpproxy cannot include another root httpproxy")
+			// Set 502 response if include references another root
+			routes = addStatusBadGatewayRoute(routes, include.Conditions)
 			continue
 		}
 
