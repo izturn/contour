@@ -41,11 +41,11 @@ func testIPFilterPolicy(namespace string) {
 		p := &contourv1.HTTPProxy{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
-				Name:      "ipfilter",
+				Name:      "ipfilter1",
 			},
 			Spec: contourv1.HTTPProxySpec{
 				VirtualHost: &contourv1.VirtualHost{
-					Fqdn: "ipfilter.projectcontour.io",
+					Fqdn: "ipfilter1.projectcontour.io",
 				},
 				Routes: []contourv1.Route{
 					{
@@ -148,11 +148,11 @@ func testIPFilterPolicy(namespace string) {
 		p := &contourv1.HTTPProxy{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
-				Name:      "ipfilter",
+				Name:      "ipfilter2",
 			},
 			Spec: contourv1.HTTPProxySpec{
 				VirtualHost: &contourv1.VirtualHost{
-					Fqdn: "ipfilter.projectcontour.io",
+					Fqdn: "ipfilter2.projectcontour.io",
 				},
 				Routes: []contourv1.Route{
 					{
@@ -285,15 +285,15 @@ func testIPFilterPolicy(namespace string) {
 		r := &contourv1.HTTPProxy{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
-				Name:      "ipfilter-root",
+				Name:      "ipfilter3-root",
 			},
 			Spec: contourv1.HTTPProxySpec{
 				VirtualHost: &contourv1.VirtualHost{
-					Fqdn: "ipfilter.projectcontour.io",
+					Fqdn: "ipfilter3.projectcontour.io",
 				},
 				Includes: []contourv1.Include{{
 					Namespace: namespace,
-					Name:      "ipfilter",
+					Name:      "ipfilter3-child",
 				}},
 			},
 		}
@@ -303,7 +303,7 @@ func testIPFilterPolicy(namespace string) {
 		p := &contourv1.HTTPProxy{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
-				Name:      "ipfilter",
+				Name:      "ipfilter3-child",
 			},
 			Spec: contourv1.HTTPProxySpec{
 				Routes: []contourv1.Route{
